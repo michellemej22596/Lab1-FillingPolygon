@@ -1,0 +1,31 @@
+# Los archivos de Rust/Cargo
+target/
+**/target/
+
+# Directorios generados por compiladores o IDEs
+# IntelliJ
+.idea/
+# VS Code
+.vscode/
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Archivos de configuración del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de construcción de Rust
+Cargo.lock
+
+# Archivos de registro
+*.log
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Otros archivos no deseados
+*.rs.bk
+*.swp
+*.bak
