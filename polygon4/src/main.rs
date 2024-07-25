@@ -37,25 +37,6 @@ fn fill_polygon(fb: &mut FrameBuffer, points: &[(i32, i32)], color: &Color, hole
             j = i;
         }
 
-        // Construir listas de nodos para los agujeros y eliminarlos de los nodos del polígono principal
-        for hole in holes {
-            let mut hole_nodes = Vec::new();
-            let mut j = hole.len() - 1;
-            for i in 0..hole.len() {
-                if (hole[i].1 < y && hole[j].1 >= y) || (hole[j].1 < y && hole[i].1 >= y) {
-                    let x = hole[i].0 + (y - hole[i].1) * (hole[j].0 - hole[i].0) / (hole[j].1 - hole[i].1);
-                    hole_nodes.push(x);
-                }
-                j = i;
-            }
-            hole_nodes.sort();
-            for hole_node in hole_nodes {
-                if let Some(pos) = nodes.iter().position(|&x| x == hole_node) {
-                    nodes.remove(pos);
-                }
-            }
-        }
-
         // Ordenar nodos
         nodes.sort();
 
@@ -67,6 +48,11 @@ fn fill_polygon(fb: &mut FrameBuffer, points: &[(i32, i32)], color: &Color, hole
                 }
             }
         }
+    }
+
+    // Rellenar los agujeros con color negro
+    for hole in holes {
+        fill_polygon(fb, hole, &Color::BLACK, &[]);
     }
 }
 
