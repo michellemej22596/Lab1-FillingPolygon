@@ -7,8 +7,8 @@ use framebuffer::FrameBuffer;
 use color::Color;
 use line::draw_line;
 
-// Agregar esta función para rellenar el polígono
-fn fill_polygon(fb: &mut FrameBuffer, points: &[(i32, i32)], color: &Color) {
+// Agregar esta función para rellenar el polígono con agujeros
+fn fill_polygon(fb: &mut FrameBuffer, points: &[(i32, i32)], color: &Color, holes: &[&[(i32, i32)]]) {
     let mut nodes = Vec::new();
     let mut min_y = points[0].1;
     let mut max_y = points[0].1;
@@ -27,7 +27,7 @@ fn fill_polygon(fb: &mut FrameBuffer, points: &[(i32, i32)], color: &Color) {
     for y in min_y..=max_y {
         nodes.clear();
 
-        // Construir una lista de nodos
+        // Construir una lista de nodos para el polígono principal
         let mut j = points.len() - 1;
         for i in 0..points.len() {
             if (points[i].1 < y && points[j].1 >= y) || (points[j].1 < y && points[i].1 >= y) {
@@ -35,6 +35,25 @@ fn fill_polygon(fb: &mut FrameBuffer, points: &[(i32, i32)], color: &Color) {
                 nodes.push(x);
             }
             j = i;
+        }
+
+        // Construir listas de nodos para los agujeros y eliminarlos de los nodos del polígono principal
+        for hole in holes {
+            let mut hole_nodes = Vec::new();
+            let mut j = hole.len() - 1;
+            for i in 0..hole.len() {
+                if (hole[i].1 < y && hole[j].1 >= y) || (hole[j].1 < y && hole[i].1 >= y) {
+                    let x = hole[i].0 + (y - hole[i].1) * (hole[j].0 - hole[i].0) / (hole[j].1 - hole[i].1);
+                    hole_nodes.push(x);
+                }
+                j = i;
+            }
+            hole_nodes.sort();
+            for hole_node in hole_nodes {
+                if let Some(pos) = nodes.iter().position(|&x| x == hole_node) {
+                    nodes.remove(pos);
+                }
+            }
         }
 
         // Ordenar nodos
@@ -54,18 +73,18 @@ fn fill_polygon(fb: &mut FrameBuffer, points: &[(i32, i32)], color: &Color) {
 fn main() {
     let mut fb = FrameBuffer::new(800, 600);
 
-    let points = [
+    let points1 = [
         (165, 380), (185, 360), (180, 330), (207, 345), (233, 330),
         (230, 360), (250, 380), (220, 385), (205, 410), (193, 383),
     ];
 
-    // Rellenar el polígono con color amarillo
-    fill_polygon(&mut fb, &points, &Color::YELLOW);
+    // Rellenar el primer polígono con color amarillo
+    fill_polygon(&mut fb, &points1, &Color::YELLOW, &[]);
 
-    // Dibujar la orilla con color blanco
-    for i in 0..points.len() {
-        let (x0, y0) = points[i];
-        let (x1, y1) = points[(i + 1) % points.len()];
+    // Dibujar la orilla del primer polígono con color blanco
+    for i in 0..points1.len() {
+        let (x0, y0) = points1[i];
+        let (x1, y1) = points1[(i + 1) % points1.len()];
         draw_line(&mut fb, x0, y0, x1, y1, &Color::WHITE);
     }
 
@@ -74,7 +93,7 @@ fn main() {
     ];
 
     // Rellenar el segundo polígono con color azul
-    fill_polygon(&mut fb, &points2, &Color::BLUE);
+    fill_polygon(&mut fb, &points2, &Color::BLUE, &[]);
 
     // Dibujar la orilla del segundo polígono con color blanco
     for i in 0..points2.len() {
@@ -88,7 +107,7 @@ fn main() {
     ];
 
     // Rellenar el tercer polígono con color rojo
-    fill_polygon(&mut fb, &points3, &Color::RED);
+    fill_polygon(&mut fb, &points3, &Color::RED, &[]);
 
     // Dibujar la orilla del tercer polígono con color blanco
     for i in 0..points3.len() {
