@@ -51,7 +51,6 @@ fn fill_polygon(fb: &mut FrameBuffer, points: &[(i32, i32)], color: &Color) {
     }
 }
 
-
 fn main() {
     let mut fb = FrameBuffer::new(800, 600);
 
@@ -60,10 +59,10 @@ fn main() {
         (230, 360), (250, 380), (220, 385), (205, 410), (193, 383),
     ];
 
-    // Rellenar el polígono
+    // Rellenar el polígono con color amarillo
     fill_polygon(&mut fb, &points, &Color::YELLOW);
 
-    // Dibujar la orilla
+    // Dibujar la orilla con color blanco
     for i in 0..points.len() {
         let (x0, y0) = points[i];
         let (x1, y1) = points[(i + 1) % points.len()];
