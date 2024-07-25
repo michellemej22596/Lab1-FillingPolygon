@@ -1,40 +1,27 @@
-use crate::framebuffer::Framebuffer;
-use nalgebra_glm::Vec3;
+use crate::framebuffer::FrameBuffer;
+use crate::color::Color;
 
-pub trait Line {
-    fn line(&mut self, start: Vec3, end: Vec3);
-}
+// Dibujar una línea entre dos puntos (x0, y0) y (x1, y1) usando el algoritmo de Bresenham
+pub fn draw_line(fb: &mut FrameBuffer, x0: i32, y0: i32, x1: i32, y1: i32, color: &Color) {
+    let dx = (x1 - x0).abs();
+    let sx = if x0 < x1 { 1 } else { -1 };
+    let dy = -(y1 - y0).abs();
+    let sy = if y0 < y1 { 1 } else { -1 };
+    let mut err = dx + dy;
+    let mut x0 = x0;
+    let mut y0 = y0;
 
-impl Line for Framebuffer {
-    fn line(&mut self, start: Vec3, end: Vec3) {
-        let dx = (end.x as i32 - start.x as i32).abs();
-        let dy = -(end.y as i32 - start.y as i32).abs();
-
-        let sx = if start.x < end.x { 1 } else { -1 };
-        let sy = if start.y < end.y { 1 } else { -1 };
-        
-        let mut err = dx + dy;
-
-        let mut current = start.map(|x| x as i32);
-
-        loop {
-            self.point(current.x as usize, current.y as usize);
-
-            if current == end.map(|x| x as i32) {
-                break;
-            }
-
-            let e2 = 2 * err;
-            
-            if e2 >= dy {
-                err += dy;
-                current.x += sx;
-            }
-            
-            if e2 <= dx {
-                err += dx;
-                current.y += sy;
-            }
+    loop {
+        fb.set_pixel(x0 as usize, y0 as usize, color);
+        if x0 == x1 && y0 == y1 { break; }
+        let e2 = 2 * err;
+        if e2 >= dy {
+            err += dy;
+            x0 += sx;
+        }
+        if e2 <= dx {
+            err += dx;
+            y0 += sy;
         }
     }
 }
