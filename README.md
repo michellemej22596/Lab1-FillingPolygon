@@ -41,6 +41,10 @@ Este proyecto crea una imagen BMP de 800x600 píxeles con los siguientes polígo
 Para ejecutar el programa, utiliza el siguiente comando:
 ```sh
 cargo run
+```
 
 ## Dependencias
 nalgebra-glm para operaciones matemáticas y de geometría.
+
+## Nota
+Existe una rama llamada BugFixed, en donde podemos encontrar la imagen volteada. 
